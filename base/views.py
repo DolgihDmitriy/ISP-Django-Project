@@ -3,7 +3,8 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
-
+import asyncio
+from base.async_requests import *
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
@@ -18,7 +19,8 @@ class CustomLoginView(LoginView):
     redirected_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('tasks')
+        success_url = get_all_access(self)
+        return asyncio.run(success_url)
 
 
 class RegisterPage(FormView):
@@ -56,7 +58,7 @@ class TaskList(LoginRequiredMixin, ListView):
         context['search_input'] = search_input
 
         return context
-        
+
 
 class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
@@ -84,7 +86,3 @@ class DeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')
-
-
-
-     
